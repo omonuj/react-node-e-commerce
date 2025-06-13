@@ -18,3 +18,24 @@ const connectDB = async () => {
         cached.promise = mongoose
             .connect(process.env.DATABASE, {
                 useNewUrlParser: true,
+                useCreateIndex: true,
+                // Mongoose 5's legacy topology (the default) hangs instead of
+                // failing on modern Node with SRV/replica-set clusters, and it
+                // ignores serverSelectionTimeoutMS. The unified topology fixes
+                // both: reliable connect, and fail-fast when unreachable.
+                useUnifiedTopology: true,
+                serverSelectionTimeoutMS: 8000
+            })
+            .then(m => m)
+            .catch(err => {
+                // Reset so the next request retries instead of reusing a rejected promise.
+                cached.promise = null;
+                throw err;
+            });
+    }
+
+    cached.conn = await cached.promise;
+    return cached.conn;
+};
+
+module.exports = connectDB;
