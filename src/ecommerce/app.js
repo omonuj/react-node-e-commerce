@@ -13,3 +13,19 @@ const productRoutes = require('./routes/product');
 const braintreeRoutes = require('./routes/braintree');
 const orderRoutes = require('./routes/order');
 // api docs
+const openapiSpec = require('./docs/openapi');
+const { swaggerHtml } = require('./docs/swaggerUi');
+
+// app
+const app = express();
+
+// middlewares
+app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(expressValidator());
+app.use(cors());
+
+// root -> API docs, so the base URL is useful
+app.get('/', (req, res) => res.redirect('/api-docs'));
+
