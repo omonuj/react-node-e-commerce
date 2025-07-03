@@ -21,3 +21,26 @@ const userSchema = new mongoose.Schema(
             required: true
         },
         about: {
+            type: String,
+            trim: true
+        },
+        salt: String,
+        role: {
+            type: Number,
+            default: 0
+        },
+        history: {
+            type: Array,
+            default: []
+        }
+    },
+    { timestamps: true }
+);
+
+// virtual field
+userSchema
+    .virtual('password')
+    .set(function(password) {
+        this._password = password;
+        this.salt = uuidv1();
+        this.hashed_password = this.encryptPassword(password);
