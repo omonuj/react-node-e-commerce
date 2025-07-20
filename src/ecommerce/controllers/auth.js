@@ -24,3 +24,29 @@ exports.signup = (req, res) => {
 
 // using async/await
 // exports.signup = async (req, res) => {
+//     try {
+//         const user = await new User(req.body);
+//         console.log(req.body);
+
+//         await user.save((err, user) => {
+//             if (err) {
+//                 // return res.status(400).json({ err });
+//                 return res.status(400).json({
+//                     error: 'Email is taken'
+//                 });
+//             }
+//             res.status(200).json({ user });
+//         });
+//     } catch (err) {
+//         console.error(err.message);
+//     }
+// };
+
+exports.signin = (req, res) => {
+    // find the user based on email
+    const { email, password } = req.body;
+    User.findOne({ email }, (err, user) => {
+        if (err || !user) {
+            return res.status(400).json({
+                error: 'User with that email does not exist. Please signup'
+            });
