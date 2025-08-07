@@ -51,3 +51,30 @@ exports.remove = (req, res) => {
     Product.find({ category }).exec((err, data) => {
         if (data.length >= 1) {
             return res.status(400).json({
+                message: `Sorry. You cant delete ${category.name}. It has ${data.length} associated products.`
+            });
+        } else {
+            category.remove((err, data) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: errorHandler(err)
+                    });
+                }
+                res.json({
+                    message: 'Category deleted'
+                });
+            });
+        }
+    });
+};
+
+exports.list = (req, res) => {
+    Category.find().exec((err, data) => {
+        if (err) {
+            return res.status(400).json({
+                error: errorHandler(err)
+            });
+        }
+        res.json(data);
+    });
+};
