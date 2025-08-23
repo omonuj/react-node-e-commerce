@@ -40,3 +40,46 @@ exports.create = (req, res) => {
         const emailData = {
             to: 'kaloraat@gmail.com',
             from: 'noreply@ecommerce.com',
+            subject: `A new order is received`,
+            html: `
+            <p>Customer name:</p>
+            <p>Total products: ${order.products.length}</p>
+            <p>Total cost: ${order.amount}</p>
+            <p>Login to dashboard to the order in detail.</p>
+        `
+        };
+        if (emailEnabled) {
+            sgMail.send(emailData).catch(err => console.error('Email send failed:', err.message));
+        }
+        res.json(data);
+    });
+};
+
+exports.listOrders = (req, res) => {
+    Order.find()
+        .populate('user', '_id name address')
+        .sort('-created')
+        .exec((err, orders) => {
+            if (err) {
+                return res.status(400).json({
+                    error: errorHandler(error)
+                });
+            }
+            res.json(orders);
+        });
+};
+
+exports.getStatusValues = (req, res) => {
+    res.json(Order.schema.path('status').enumValues);
+};
+
+exports.updateOrderStatus = (req, res) => {
+    Order.update({ _id: req.body.orderId }, { $set: { status: req.body.status } }, (err, order) => {
+        if (err) {
+            return res.status(400).json({
+                error: errorHandler(err)
+            });
+        }
+        res.json(order);
+    });
+};
