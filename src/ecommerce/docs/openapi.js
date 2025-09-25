@@ -162,3 +162,168 @@ const openapiSpec = {
             CreateOrderRequest: {
                 type: 'object',
                 required: ['order'],
+                properties: {
+                    order: {
+                        type: 'object',
+                        properties: {
+                            products: { type: 'array', items: { $ref: '#/components/schemas/CartItem' } },
+                            transaction_id: { type: 'string' },
+                            amount: { type: 'number', example: 129.99 },
+                            address: { type: 'string', example: '123 Main St' }
+                        }
+                    }
+                }
+            },
+            PaymentRequest: {
+                type: 'object',
+                required: ['paymentMethodNonce', 'amount'],
+                properties: {
+                    paymentMethodNonce: { type: 'string', example: 'fake-valid-nonce' },
+                    amount: { type: 'number', example: 129.99 }
+                }
+            }
+        },
+        responses: {
+            Unauthorized: {
+                description: 'Missing or invalid JWT',
+                content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+            },
+            Forbidden: {
+                description: 'Authenticated but not allowed (isAuth / isAdmin)',
+                content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+            }
+        }
+    },
+    paths: {
+        '/signup': {
+            post: {
+                tags: ['Auth'],
+                summary: 'Register a new user',
+                requestBody: {
+                    required: true,
+                    content: { 'application/json': { schema: { $ref: '#/components/schemas/SignupRequest' } } }
+                },
+                responses: {
+                    200: {
+                        description: 'Created user',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: { user: { $ref: '#/components/schemas/User' } }
+                                }
+                            }
+                        }
+                    },
+                    400: {
+                        description: 'Validation error or email taken',
+                        content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+                    }
+                }
+            }
+        },
+        '/signin': {
+            post: {
+                tags: ['Auth'],
+                summary: 'Sign in and receive a JWT',
+                requestBody: {
+                    required: true,
+                    content: { 'application/json': { schema: { $ref: '#/components/schemas/SigninRequest' } } }
+                },
+                responses: {
+                    200: {
+                        description: 'Authenticated',
+                        content: { 'application/json': { schema: { $ref: '#/components/schemas/SigninResponse' } } }
+                    },
+                    400: { description: 'No user with that email', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+                    401: { description: 'Email and password do not match', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+                }
+            }
+        },
+        '/signout': {
+            get: {
+                tags: ['Auth'],
+                summary: 'Clear the auth cookie',
+                responses: {
+                    200: { description: 'Signed out', content: { 'application/json': { schema: { $ref: '#/components/schemas/Message' } } } }
+                }
+            }
+        },
+        '/secret': {
+            get: {
+                tags: ['User'],
+                summary: 'Auth smoke-test endpoint',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: { description: 'OK', content: { 'application/json': { schema: { type: 'object', properties: { user: { type: 'string' } } } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' }
+                }
+            }
+        },
+        '/user/{userId}': {
+            get: {
+                tags: ['User'],
+                summary: 'Get a user profile',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'User', content: { 'application/json': { schema: { $ref: '#/components/schemas/User' } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            },
+            put: {
+                tags: ['User'],
+                summary: 'Update a user profile',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string' },
+                                    password: { type: 'string' },
+                                    about: { type: 'string' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: { description: 'Updated user', content: { 'application/json': { schema: { $ref: '#/components/schemas/User' } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
+        '/orders/by/user/{userId}': {
+            get: {
+                tags: ['User'],
+                summary: 'Purchase history for a user',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Orders', content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Order' } } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
+        '/categories': {
+            get: {
+                tags: ['Category'],
+                summary: 'List all categories',
+                responses: {
+                    200: { description: 'Categories', content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Category' } } } } }
+                }
+            }
+        },
+        '/category/{categoryId}': {
+            get: {
+                tags: ['Category'],
+                summary: 'Get a category by id',
+                parameters: [{ name: 'categoryId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Category', content: { 'application/json': { schema: { $ref: '#/components/schemas/Category' } } } },
