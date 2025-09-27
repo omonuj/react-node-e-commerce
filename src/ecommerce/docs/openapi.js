@@ -327,3 +327,167 @@ const openapiSpec = {
                 parameters: [{ name: 'categoryId', in: 'path', required: true, schema: { type: 'string' } }],
                 responses: {
                     200: { description: 'Category', content: { 'application/json': { schema: { $ref: '#/components/schemas/Category' } } } },
+                    400: { description: 'Not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+                }
+            }
+        },
+        '/category/create/{userId}': {
+            post: {
+                tags: ['Category'],
+                summary: 'Create a category (admin)',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/CategoryRequest' } } } },
+                responses: {
+                    200: { description: 'Created', content: { 'application/json': { schema: { type: 'object', properties: { data: { $ref: '#/components/schemas/Category' } } } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
+        '/category/{categoryId}/{userId}': {
+            put: {
+                tags: ['Category'],
+                summary: 'Update a category (admin)',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    { name: 'categoryId', in: 'path', required: true, schema: { type: 'string' } },
+                    { name: 'userId', in: 'path', required: true, schema: { type: 'string' } }
+                ],
+                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/CategoryRequest' } } } },
+                responses: {
+                    200: { description: 'Updated', content: { 'application/json': { schema: { $ref: '#/components/schemas/Category' } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            },
+            delete: {
+                tags: ['Category'],
+                summary: 'Delete a category (admin)',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    { name: 'categoryId', in: 'path', required: true, schema: { type: 'string' } },
+                    { name: 'userId', in: 'path', required: true, schema: { type: 'string' } }
+                ],
+                responses: {
+                    200: { description: 'Deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Message' } } } },
+                    400: { description: 'Has associated products', content: { 'application/json': { schema: { $ref: '#/components/schemas/Message' } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
+        '/products': {
+            get: {
+                tags: ['Product'],
+                summary: 'List products',
+                parameters: [
+                    { name: 'sortBy', in: 'query', schema: { type: 'string', default: '_id' }, description: 'e.g. sold, createdAt' },
+                    { name: 'order', in: 'query', schema: { type: 'string', enum: ['asc', 'desc'], default: 'asc' } },
+                    { name: 'limit', in: 'query', schema: { type: 'integer', default: 6 } }
+                ],
+                responses: {
+                    200: { description: 'Products', content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Product' } } } } }
+                }
+            }
+        },
+        '/products/search': {
+            get: {
+                tags: ['Product'],
+                summary: 'Search products by name and category',
+                parameters: [
+                    { name: 'search', in: 'query', schema: { type: 'string' } },
+                    { name: 'category', in: 'query', schema: { type: 'string' }, description: 'Category id or "All"' }
+                ],
+                responses: {
+                    200: { description: 'Products', content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Product' } } } } }
+                }
+            }
+        },
+        '/products/related/{productId}': {
+            get: {
+                tags: ['Product'],
+                summary: 'List products related to a product (same category)',
+                parameters: [{ name: 'productId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Products', content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Product' } } } } }
+                }
+            }
+        },
+        '/products/categories': {
+            get: {
+                tags: ['Product'],
+                summary: 'List category ids that have products',
+                responses: {
+                    200: { description: 'Category ids', content: { 'application/json': { schema: { type: 'array', items: { type: 'string' } } } } }
+                }
+            }
+        },
+        '/products/by/search': {
+            post: {
+                tags: ['Product'],
+                summary: 'Filtered product search (category + price range)',
+                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ProductSearchRequest' } } } },
+                responses: {
+                    200: {
+                        description: 'Products',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        size: { type: 'integer' },
+                                        data: { type: 'array', items: { $ref: '#/components/schemas/Product' } }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        '/product/{productId}': {
+            get: {
+                tags: ['Product'],
+                summary: 'Get a product by id (photo omitted)',
+                parameters: [{ name: 'productId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Product', content: { 'application/json': { schema: { $ref: '#/components/schemas/Product' } } } },
+                    400: { description: 'Not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+                }
+            }
+        },
+        '/product/create/{userId}': {
+            post: {
+                tags: ['Product'],
+                summary: 'Create a product (admin, multipart)',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'multipart/form-data': {
+                            schema: {
+                                type: 'object',
+                                required: ['name', 'description', 'price', 'category'],
+                                properties: {
+                                    name: { type: 'string' },
+                                    description: { type: 'string' },
+                                    price: { type: 'number' },
+                                    category: { type: 'string', description: 'Category id' },
+                                    quantity: { type: 'integer' },
+                                    shipping: { type: 'boolean' },
+                                    photo: { type: 'string', format: 'binary' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: { description: 'Created product', content: { 'application/json': { schema: { $ref: '#/components/schemas/Product' } } } },
+                    400: { description: 'Validation error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
