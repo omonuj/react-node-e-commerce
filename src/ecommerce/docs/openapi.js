@@ -491,3 +491,168 @@ const openapiSpec = {
                 }
             }
         },
+        '/product/{productId}/{userId}': {
+            put: {
+                tags: ['Product'],
+                summary: 'Update a product (admin, multipart)',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    { name: 'productId', in: 'path', required: true, schema: { type: 'string' } },
+                    { name: 'userId', in: 'path', required: true, schema: { type: 'string' } }
+                ],
+                requestBody: {
+                    content: {
+                        'multipart/form-data': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string' },
+                                    description: { type: 'string' },
+                                    price: { type: 'number' },
+                                    category: { type: 'string' },
+                                    quantity: { type: 'integer' },
+                                    shipping: { type: 'boolean' },
+                                    photo: { type: 'string', format: 'binary' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: { description: 'Updated product', content: { 'application/json': { schema: { $ref: '#/components/schemas/Product' } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            },
+            delete: {
+                tags: ['Product'],
+                summary: 'Delete a product (admin)',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    { name: 'productId', in: 'path', required: true, schema: { type: 'string' } },
+                    { name: 'userId', in: 'path', required: true, schema: { type: 'string' } }
+                ],
+                responses: {
+                    200: { description: 'Deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Message' } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
+        '/product/photo/{productId}': {
+            get: {
+                tags: ['Product'],
+                summary: 'Get a product photo (binary image)',
+                parameters: [{ name: 'productId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Image', content: { 'image/*': { schema: { type: 'string', format: 'binary' } } } }
+                }
+            }
+        },
+        '/braintree/getToken/{userId}': {
+            get: {
+                tags: ['Payment'],
+                summary: 'Get a Braintree client token',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Client token', content: { 'application/json': { schema: { type: 'object', properties: { clientToken: { type: 'string' } } } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
+        '/braintree/payment/{userId}': {
+            post: {
+                tags: ['Payment'],
+                summary: 'Process a Braintree payment',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/PaymentRequest' } } } },
+                responses: {
+                    200: { description: 'Payment result' },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' },
+                    500: { description: 'Payment failed', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+                }
+            }
+        },
+        '/order/create/{userId}': {
+            post: {
+                tags: ['Order'],
+                summary: 'Create an order',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateOrderRequest' } } } },
+                responses: {
+                    200: { description: 'Created order', content: { 'application/json': { schema: { $ref: '#/components/schemas/Order' } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
+        '/order/list/{userId}': {
+            get: {
+                tags: ['Order'],
+                summary: 'List all orders (admin)',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Orders', content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Order' } } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
+        '/order/status-values/{userId}': {
+            get: {
+                tags: ['Order'],
+                summary: 'Allowed order status values (admin)',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Status values', content: { 'application/json': { schema: { type: 'array', items: { type: 'string' } } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        },
+        '/order/{orderId}/status/{userId}': {
+            put: {
+                tags: ['Order'],
+                summary: 'Update an order status (admin)',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    { name: 'orderId', in: 'path', required: true, schema: { type: 'string' } },
+                    { name: 'userId', in: 'path', required: true, schema: { type: 'string' } }
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['status', 'orderId'],
+                                properties: {
+                                    // NOTE: controller reads orderId + status from the body.
+                                    orderId: { type: 'string' },
+                                    status: {
+                                        type: 'string',
+                                        enum: ['Not processed', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: { description: 'Updated order', content: { 'application/json': { schema: { $ref: '#/components/schemas/Order' } } } },
+                    401: { $ref: '#/components/responses/Unauthorized' },
+                    403: { $ref: '#/components/responses/Forbidden' }
+                }
+            }
+        }
+    }
+};
+
+module.exports = openapiSpec;
