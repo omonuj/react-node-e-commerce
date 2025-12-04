@@ -38,3 +38,43 @@ const Card = ({
   };
 
   const showAddToCartBtn = showAddToCartButton => {
+    return (
+      showAddToCartButton && (
+        <button onClick={addToCart} className="btn btn-outline-warning mt-2 mb-2 card-btn-1  ">
+          Add to cart
+        </button>
+      )
+    );
+  };
+
+  const showStock = quantity => {
+    return quantity > 0 ? (
+      <span className="badge badge-primary badge-pill">In Stock </span>
+    ) : (
+      <span className="badge badge-primary badge-pill">Out of Stock </span>
+    );
+  };
+
+  const handleChange = productId => event => {
+    setRun(!run); // run useEffect in parent Cart
+    setCount(event.target.value < 1 ? 1 : event.target.value);
+    if (event.target.value >= 1) {
+      updateItem(productId, event.target.value);
+    }
+  };
+
+  const showCartUpdateOptions = cartUpdate => {
+    return (
+      cartUpdate && (
+        <div>
+          <div className="input-group mb-3">
+            <div className="input-group-prepend">
+              <span className="input-group-text">Adjust Quantity</span>
+            </div>
+            <input type="number" className="form-control" value={count} onChange={handleChange(product._id)} />
+          </div>
+        </div>
+      )
+    );
+  };
+  const showRemoveButton = showRemoveProductButton => {
