@@ -57,3 +57,63 @@ const Checkout = ({ products, setRun = f => f, run = undefined }) => {
     };
 
     let deliveryAddress = data.address;
+
+    const buy = () => {
+        setData({ loading: true });
+        // send the nonce to your server
+        // nonce = data.instance.requestPaymentMethod()
+        let nonce;
+        let getNonce = data.instance
+            .requestPaymentMethod()
+            .then(data => {
+                // console.log(data);
+                nonce = data.nonce;
+                // once you have nonce (card type, card number) send nonce as 'paymentMethodNonce'
+                // and also total to be charged
+                // console.log(
+                //     "send nonce and total to process: ",
+                //     nonce,
+                //     getTotal(products)
+                // );
+                const paymentData = {
+                    paymentMethodNonce: nonce,
+                    amount: getTotal(products)
+                };
+
+                processPayment(userId, token, paymentData)
+                    .then(response => {
+                        console.log(response);
+                        // empty cart
+                        // create order
+
+                        const createOrderData = {
+                            products: products,
+                            transaction_id: response.transaction.id,
+                            amount: response.transaction.amount,
+                            address: deliveryAddress
+                        };
+
+                        createOrder(userId, token, createOrderData)
+                            .then(response => {
+                                emptyCart(() => {
+                                    setRun(!run); // run useEffect in parent Cart
+                                    console.log('payment success and empty cart');
+                                    setData({
+                                        loading: false,
+                                        success: true
+                                    });
+                                });
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                setData({ loading: false });
+                            });
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        setData({ loading: false });
+                    });
+            })
+            .catch(error => {
+                // console.log("dropin error: ", error);
+                setData({ ...data, error: error.message });
