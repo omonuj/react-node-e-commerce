@@ -76,3 +76,42 @@ const Dashboard = () => {
                                         return (
                                             <div key={i}>
                                                 <h6>Product name: {p.name}</h6>
+                                                <h6>
+                                                    Product price: ${p.price}
+                                                </h6>
+                                                <h6>
+                                                    Purchased date:{" "}
+                                                    {moment(
+                                                        p.createdAt
+                                                    ).fromNow()}
+                                                </h6>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        })}
+                    </li>
+                </ul>
+            </div>
+        );
+    };
+
+    return (
+        <Layout
+            title="Dashboard"
+            description={`G'day ${name}!`}
+            className="container-fluid"
+        >
+            <div className="row">
+                <div className="col-3">{userLinks()}</div>
+                <div className="col-9">
+                    {userInfo()}
+                    {purchaseHistory(history)}
+                </div>
+            </div>
+        </Layout>
+    );
+};
+
+export default Dashboard;
