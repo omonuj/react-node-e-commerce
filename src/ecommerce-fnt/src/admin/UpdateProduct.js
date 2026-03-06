@@ -134,3 +134,72 @@ const UpdateProduct = ({ match }) => {
                 <select onChange={handleChange('category')} className="form-control">
                     <option>Please select</option>
                     {categories &&
+                        categories.map((c, i) => (
+                            <option key={i} value={c._id}>
+                                {c.name}
+                            </option>
+                        ))}
+                </select>
+            </div>
+
+            <div className="form-group">
+                <label className="text-muted">Shipping</label>
+                <select onChange={handleChange('shipping')} className="form-control">
+                    <option>Please select</option>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div className="form-group">
+                <label className="text-muted">Quantity</label>
+                <input onChange={handleChange('quantity')} type="number" className="form-control" value={quantity} />
+            </div>
+
+            <button className="btn btn-outline-primary">Update Product</button>
+        </form>
+    );
+
+    const showError = () => (
+        <div className="alert alert-danger" style={{ display: error ? '' : 'none' }}>
+            {error}
+        </div>
+    );
+
+    const showSuccess = () => (
+        <div className="alert alert-info" style={{ display: createdProduct ? '' : 'none' }}>
+            <h2>{`${createdProduct}`} is updated!</h2>
+        </div>
+    );
+
+    const showLoading = () =>
+        loading && (
+            <div className="alert alert-success">
+                <h2>Loading...</h2>
+            </div>
+        );
+
+    const redirectUser = () => {
+        if (redirectToProfile) {
+            if (!error) {
+                return <Redirect to="/" />;
+            }
+        }
+    };
+
+    return (
+        <Layout title="Add a new product" description={`G'day ${user.name}, ready to add a new product?`}>
+            <div className="row">
+                <div className="col-md-8 offset-md-2">
+                    {showLoading()}
+                    {showSuccess()}
+                    {showError()}
+                    {newPostForm()}
+                    {redirectUser()}
+                </div>
+            </div>
+        </Layout>
+    );
+};
+
+export default UpdateProduct;
