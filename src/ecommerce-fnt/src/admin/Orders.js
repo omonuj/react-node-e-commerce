@@ -54,3 +54,60 @@ const Orders = () => {
                 <div className="input-group-text">{key}</div>
             </div>
             <input
+                type="text"
+                value={value}
+                className="form-control"
+                readOnly
+            />
+        </div>
+    );
+
+    const handleStatusChange = (e, orderId) => {
+        updateOrderStatus(user._id, token, orderId, e.target.value).then(
+            data => {
+                if (data.error) {
+                    console.log("Status update failed");
+                } else {
+                    loadOrders();
+                }
+            }
+        );
+    };
+
+    const showStatus = o => (
+        <div className="form-group">
+            <h3 className="mark mb-4">Status: {o.status}</h3>
+            <select
+                className="form-control"
+                onChange={e => handleStatusChange(e, o._id)}
+            >
+                <option>Update Status</option>
+                {statusValues.map((status, index) => (
+                    <option key={index} value={status}>
+                        {status}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
+
+    return (
+        <Layout
+            title="Orders"
+            description={`G'day ${
+                user.name
+            }, you can manage all the orders here`}
+            className="container-fluid"
+        >
+            <div className="row">
+                <div className="col-md-8 offset-md-2">
+                    {showOrdersLength()}
+
+                    {orders.map((o, oIndex) => {
+                        return (
+                            <div
+                                className="mt-5"
+                                key={oIndex}
+                                style={{ borderBottom: "5px solid indigo" }}
+                            >
+                                <h2 className="mb-5">
