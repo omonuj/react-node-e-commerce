@@ -111,3 +111,60 @@ const Orders = () => {
                                 style={{ borderBottom: "5px solid indigo" }}
                             >
                                 <h2 className="mb-5">
+                                    <span className="bg-primary">
+                                        Order ID: {o._id}
+                                    </span>
+                                </h2>
+
+                                <ul className="list-group mb-2">
+                                    <li className="list-group-item">
+                                        {showStatus(o)}
+                                    </li>
+                                    <li className="list-group-item">
+                                        Transaction ID: {o.transaction_id}
+                                    </li>
+                                    <li className="list-group-item">
+                                        Amount: ${o.amount}
+                                    </li>
+                                    <li className="list-group-item">
+                                        Ordered by: {o.user.name}
+                                    </li>
+                                    <li className="list-group-item">
+                                        Ordered on:{" "}
+                                        {moment(o.createdAt).fromNow()}
+                                    </li>
+                                    <li className="list-group-item">
+                                        Delivery address: {o.address}
+                                    </li>
+                                </ul>
+
+                                <h3 className="mt-4 mb-4 font-italic">
+                                    Total products in the order:{" "}
+                                    {o.products.length}
+                                </h3>
+
+                                {o.products.map((p, pIndex) => (
+                                    <div
+                                        className="mb-4"
+                                        key={pIndex}
+                                        style={{
+                                            padding: "20px",
+                                            border: "1px solid indigo"
+                                        }}
+                                    >
+                                        {showInput("Product name", p.name)}
+                                        {showInput("Product price", p.price)}
+                                        {showInput("Product total", p.count)}
+                                        {showInput("Product Id", p._id)}
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </Layout>
+    );
+};
+
+export default Orders;
