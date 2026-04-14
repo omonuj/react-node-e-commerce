@@ -1,0 +1,33 @@
+name: CI
+
+# Runs tests on every push and PR. Vercel handles deployment (CD) automatically
+# when `main` updates, so this workflow focuses on catching breakage before merge.
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same branch/PR to save minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/ecommerce
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: src/ecommerce/package-lock.json
+
+      - name: Install dependencies
