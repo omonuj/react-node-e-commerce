@@ -31,3 +31,36 @@ jobs:
           cache-dependency-path: src/ecommerce/package-lock.json
 
       - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        # Tests use dummy env from tests/setupEnv.js and never touch a real DB,
+        # so no secrets are required here.
+
+  frontend:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/ecommerce-fnt
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: src/ecommerce-fnt/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build
+        run: npm run build
+        env:
+          # Legacy CRA treats lint warnings as errors when CI=true; keep the
+          # build green on pre-existing warnings while still catching real
+          # compile failures.
+          CI: false
