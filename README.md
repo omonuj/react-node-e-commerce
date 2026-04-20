@@ -62,3 +62,68 @@ react-node-ecommerce/
         ├── server.js         # Static production server (Express + compression)
         └── src/
             ├── auth/          # Auth API calls + route guards
+            ├── admin/         # Admin dashboard screens
+            ├── core/          # Storefront (home, shop, cart, checkout, product cards)
+            └── user/          # User dashboard, profile, sign in/up
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (LTS recommended)
+- A running [MongoDB](https://www.mongodb.com/) instance (local or Atlas)
+- A [Braintree](https://www.braintreepayments.com/) sandbox account (for checkout)
+- A [SendGrid](https://sendgrid.com/) account (optional, for email)
+
+### 1. Clone and install
+
+```bash
+git clone <your-repo-url>
+cd react-node-ecommerce/final-code-with-improvments
+
+# Backend
+cd ecommerce
+npm install
+
+# Frontend
+cd ../ecommerce-front
+npm install   # or: yarn install
+```
+
+### 2. Configure environment
+
+Create a `.env` file in **both** `ecommerce/` and `ecommerce-front/` (see [Environment Variables](#environment-variables)).
+
+### 3. Run
+
+```bash
+# Terminal 1 — backend (http://localhost:8000)
+cd ecommerce
+npm start
+
+# Terminal 2 — frontend (http://localhost:3000)
+cd ecommerce-front
+npm start
+```
+
+---
+
+## Environment Variables
+
+**`ecommerce/.env`** (backend)
+
+```env
+DATABASE=mongodb://localhost:27017/ecommerce
+PORT=8000
+JWT_SECRET=your_jwt_secret
+BRAINTREE_MERCHANT_ID=your_merchant_id
+BRAINTREE_PUBLIC_KEY=your_public_key
+BRAINTREE_PRIVATE_KEY=your_private_key
+```
+
+**`ecommerce-front/.env`** (frontend)
+
+```env
