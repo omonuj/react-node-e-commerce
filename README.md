@@ -127,3 +127,67 @@ BRAINTREE_PRIVATE_KEY=your_private_key
 **`ecommerce-front/.env`** (frontend)
 
 ```env
+REACT_APP_API_URL=http://localhost:8000/api
+```
+
+> ⚠️ Never commit `.env` files — they are ignored via `.gitignore`.
+
+---
+
+## Available Scripts
+
+### Backend (`ecommerce/`)
+
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start the API with `nodemon` (auto‑reload) |
+
+### Frontend (`ecommerce-front/`)
+
+| Command | Description |
+|---------|-------------|
+| `npm start` | Run the development server |
+| `npm run build` | Build for production |
+| `npm test` | Run tests |
+
+---
+
+## API Reference
+
+All routes are prefixed with `/api`.
+
+### Interactive docs (Swagger / OpenAPI)
+
+An interactive Swagger UI is served by the backend, so you can browse and try every endpoint:
+
+| Environment | Swagger UI | OpenAPI spec (JSON) |
+|-------------|-----------|---------------------|
+| **Live (Vercel)** | https://react-node-e-commerce-delta.vercel.app/api-docs | https://react-node-e-commerce-delta.vercel.app/api-docs.json |
+| **Local** | http://localhost:8000/api-docs | http://localhost:8000/api-docs.json |
+
+The spec is defined in [`ecommerce/docs/openapi.js`](src/ecommerce/docs/openapi.js) and mounted in [`ecommerce/app.js`](src/ecommerce/app.js). Protected routes use a JWT from `POST /signin` — click **Authorize** in Swagger UI and paste the token to try them.
+
+### Auth
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/signup` | Register a new user |
+| POST | `/signin` | Authenticate and receive a JWT |
+| GET  | `/signout` | Clear the auth cookie |
+
+### Users
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/user/:userId` | Get a user profile (auth) |
+| PUT | `/user/:userId` | Update a user profile (auth) |
+| GET | `/orders/by/user/:userId` | Get a user's purchase history (auth) |
+
+### Products
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/products` | List products (supports `sortBy`, `order`, `limit`) |
+| GET | `/product/:productId` | Get a single product |
+| GET | `/product/photo/:productId` | Get a product's photo |
+| GET | `/products/search` | Search products |
+| GET | `/products/related/:productId` | Related products |
+| GET | `/products/categories` | Categories that have products |
+| POST | `/products/by/search` | Filtered product search |
