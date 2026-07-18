@@ -19,8 +19,11 @@ const connectDB = async () => {
             .connect(process.env.DATABASE, {
                 useNewUrlParser: true,
                 useCreateIndex: true,
-                // Fail fast instead of hanging the serverless function when the
-                // cluster is unreachable / credentials are wrong.
+                // Mongoose 5's legacy topology (the default) hangs instead of
+                // failing on modern Node with SRV/replica-set clusters, and it
+                // ignores serverSelectionTimeoutMS. The unified topology fixes
+                // both: reliable connect, and fail-fast when unreachable.
+                useUnifiedTopology: true,
                 serverSelectionTimeoutMS: 8000
             })
             .then(m => m)
