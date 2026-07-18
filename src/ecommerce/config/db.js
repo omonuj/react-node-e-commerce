@@ -18,9 +18,17 @@ const connectDB = async () => {
         cached.promise = mongoose
             .connect(process.env.DATABASE, {
                 useNewUrlParser: true,
-                useCreateIndex: true
+                useCreateIndex: true,
+                // Fail fast instead of hanging the serverless function when the
+                // cluster is unreachable / credentials are wrong.
+                serverSelectionTimeoutMS: 8000
             })
-            .then(m => m);
+            .then(m => m)
+            .catch(err => {
+                // Reset so the next request retries instead of reusing a rejected promise.
+                cached.promise = null;
+                throw err;
+            });
     }
 
     cached.conn = await cached.promise;
