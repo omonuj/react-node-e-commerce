@@ -156,6 +156,17 @@ REACT_APP_API_URL=http://localhost:8000/api
 
 All routes are prefixed with `/api`.
 
+### Interactive docs (Swagger / OpenAPI)
+
+An interactive Swagger UI is served by the backend, so you can browse and try every endpoint:
+
+| Environment | Swagger UI | OpenAPI spec (JSON) |
+|-------------|-----------|---------------------|
+| **Live (Vercel)** | https://react-node-e-commerce-delta.vercel.app/api-docs | https://react-node-e-commerce-delta.vercel.app/api-docs.json |
+| **Local** | http://localhost:8000/api-docs | http://localhost:8000/api-docs.json |
+
+The spec is defined in [`ecommerce/docs/openapi.js`](src/ecommerce/docs/openapi.js) and mounted in [`ecommerce/app.js`](src/ecommerce/app.js). Protected routes use a JWT from `POST /signin` — click **Authorize** in Swagger UI and paste the token to try them.
+
 ### Auth
 | Method | Endpoint | Description |
 |--------|----------|-------------|
