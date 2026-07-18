@@ -26,6 +26,9 @@ app.use(cookieParser());
 app.use(expressValidator());
 app.use(cors());
 
+// root -> API docs, so the base URL is useful
+app.get('/', (req, res) => res.redirect('/api-docs'));
+
 // api docs: raw spec + Swagger UI (CDN-rendered, Vercel-friendly)
 app.get('/api-docs.json', (req, res) => res.json(openapiSpec));
 app.get('/api-docs', (req, res) => {

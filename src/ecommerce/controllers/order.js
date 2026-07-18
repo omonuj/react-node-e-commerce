@@ -2,7 +2,12 @@ const { Order, CartItem } = require('../models/order');
 const { errorHandler } = require('../helpers/dbErrorHandler');
 // sendgrid for email npm i @sendgrid/mail
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// Only configure SendGrid when a key is present; otherwise email is skipped so
+// order creation still works on a server without SENDGRID_API_KEY.
+const emailEnabled = !!process.env.SENDGRID_API_KEY;
+if (emailEnabled) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 exports.orderById = (req, res, next, id) => {
     Order.findById(id)
@@ -43,7 +48,9 @@ exports.create = (req, res) => {
             <p>Login to dashboard to the order in detail.</p>
         `
         };
-        sgMail.send(emailData);
+        if (emailEnabled) {
+            sgMail.send(emailData).catch(err => console.error('Email send failed:', err.message));
+        }
         res.json(data);
     });
 };
