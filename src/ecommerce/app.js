@@ -12,6 +12,9 @@ const categoryRoutes = require('./routes/category');
 const productRoutes = require('./routes/product');
 const braintreeRoutes = require('./routes/braintree');
 const orderRoutes = require('./routes/order');
+// api docs
+const openapiSpec = require('./docs/openapi');
+const { swaggerHtml } = require('./docs/swaggerUi');
 
 // app
 const app = express();
@@ -22,6 +25,12 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(expressValidator());
 app.use(cors());
+
+// api docs: raw spec + Swagger UI (CDN-rendered, Vercel-friendly)
+app.get('/api-docs.json', (req, res) => res.json(openapiSpec));
+app.get('/api-docs', (req, res) => {
+    res.type('html').send(swaggerHtml('/api-docs.json', openapiSpec.info.title));
+});
 
 // routes middleware
 app.use('/api', authRoutes);
